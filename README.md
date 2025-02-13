@@ -24,7 +24,8 @@ Depth estimation is the task of measuring the distance of each pixel relative to
 
 
 ## News
-* **2024-08-20:** Added CLI (xa1on)
+* **2025-02-13:** Add Metric Depth Estimation(PCL).
+* **2024-08-20:** Added CLI (xa1on).
 * **2024-06-20:** Added support for TensorRT 10.
 * **2024-06-17:** [Depth Anything V2](https://github.com/DepthAnything/Depth-Anything-V2) has been integrated.
 * **2024-01-23:** The Depth Anything [TensorRT](https://github.com/spacewalk01/depth-anything-tensorrt) version has been created.
@@ -122,7 +123,7 @@ Perform the following steps to create an onnx model:
   
 2. Copy [dpt.py](https://github.com/spacewalk01/depth-anything-tensorrt/blob/main/depth_anything_v1/dpt.py) in depth_anything_v1 from this repo to `<Depth-Anything>/depth_anything` folder. And, Copy [export_v1.py](https://github.com/spacewalk01/depth-anything-tensorrt/blob/main/depth_anything_v1/export_v1.py) in depth_anything_v1 from this repo to `<Depth-Anything>` folder.
 3. Export the model to onnx format using [export_v1.py](https://github.com/spacewalk01/depth-anything-tensorrt/blob/main/depth_anything_v1/export_v1.py). You will get an onnx file named `depth_anything_vit{}14.onnx`, such as `depth_anything_vitb14.onnx`. Note that I used torch cpu version for exporting the onnx model as it is not necessary to deploy the model on GPU when exporting.
-
+4. If you want to estimate metric depth, we also supply the method with point cloud output. Please read [official python achievement](https://github.com/DepthAnything/Depth-Anything-V2/tree/main/metric_depth) carefully and replace the [Pre-trained Models](https://github.com/DepthAnything/Depth-Anything-V2/tree/main/metric_depth#pre-trained-models).
     
     ``` shell
     conda create -n depth-anything python=3.8

@@ -48,8 +48,16 @@
 
 5. Finally, copy the opencv dll files such as `opencv_world490.dll` and `opencv_videoio_ffmpeg490_64.dll` into the `<depth_anything_installpath>/build/Release` folder.
     
+6. Additionally, if you want to generate metric depth estimation with point cloud, you also need to install [PCL](https://pointclouds.org/).
+   ```bash
+   # Download PCL with vcpkg(Recommanded)
+   git clone https://github.com/microsoft/vcpkg.git
+   .\vcpkg\bootstrap-vcpkg.bat
+   .\vcpkg\vcpkg install pcl:x64-windows
+   ```
 
 ## Tested Environment
    - TensorRT 8.6
    - CUDA 11.6
    - Windows 10
+   - PCL 1.13.1

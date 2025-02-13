@@ -8,13 +8,23 @@
 #include "utils.h"
 #include "depth_anything.h"
 #ifdef _WIN32
+#define NOMINMAX        // avoid macro conflict(min/max) between PCL and Std
 #include <windows.h>
+#include <algorithm>  // make sure std::max/std::min can use normally
+#include <Eigen/Dense>
+#include <pcl/io/ply_io.h>
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include <filesystem>
 #else
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
 
 using namespace std;
+
+#define Cl_size 518                      
+#define Focal_length 3686.4     //finetune this para if you don't satisfy the result
 
 // Helper function to replace all occurrences of a character in a string
 void replaceChar(std::string& str, char find, char replace) {
@@ -338,18 +348,66 @@ int main(int argc, char** argv) {
 
                 // open image
                 cv::Mat frame = cv::imread(imagePath);
+                // annotate this line if VRSM is enough
+                cv::resize(frame, frame, cv::Size(Cl_size, Cl_size), 0, 0, cv::INTER_LANCZOS4);
                 if (frame.empty())
                 {
                     cerr << "Error reading image: " << imagePath << endl;
                     continue;
                 }
                 
-
+                
                 auto start = chrono::system_clock::now();
                 cv::Mat result_d = depth_model.predict(frame);
                 auto end = chrono::system_clock::now();
                 double tpf = chrono::duration_cast<std::chrono::duration<double, std::milli>>(end - start).count();
                 cout << "time per frame:" << setw(9) << tpf << "ms fps:" << setw(4) << floor(100 / (tpf / 1000)) / 100.0 << endl;
+                
+                if (result_d.type() != CV_32F) {
+                    result_d.convertTo(result_d, CV_32F);
+                }
+                // Resize the depth mat of prediction
+                cv::Mat resized_pred;
+                cv::resize(result_d, resized_pred, cv::Size(Cl_size, Cl_size), 0, 0, cv::INTER_NEAREST);
+
+                // Create PCL ponitcloud object
+                pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+                cloud->width = Cl_size;
+                cloud->height = Cl_size;
+                cloud->is_dense = true;
+                cloud->points.resize(cloud->width* cloud->height);
+                // Generate gria and calculate offsets
+                for (int y = 0; y < Cl_size; ++y) {
+                    for (int x = 0; x < Cl_size; ++x) {
+                        double depth = resized_pred.at<float>(y, x);
+                        if (depth > 10000 || depth < 0.01) continue;  // filter wrong depth numbers
+                        pcl::PointXYZRGB point;
+                        point.x = (static_cast<float>(x) - Cl_size / 2.0f) * depth / Focal_length;
+                        point.y = (static_cast<float>(y) - Cl_size / 2.0f) * depth / Focal_length;
+                        point.z = depth;
+                        cv::Vec3b color = frame.at<cv::Vec3b>(y, x);
+                        point.r = color[2];
+                        point.g = color[1];
+                        point.b = color[0];
+                        cloud->at(x, y) = point;
+                    }
+                }
+
+                std::cout << "Depth range: "
+                    << resized_pred.at<float>(0, 0) << " to "
+                    << resized_pred.at<float>(Cl_size - 1, Cl_size - 1) << std::endl;
+
+                std::cout << "Sample point: ("
+                    << cloud->points[0].x << ", "
+                    << cloud->points[0].y << ", "
+                    << cloud->points[0].z << ")" << std::endl;
+
+                // Save PCL ponitcloud file
+                std::filesystem::path file_path(imagePath);
+                std::string output_filename = (std::filesystem::path("result_pcl") / file_path.stem()).string() + ".ply";
+                pcl::io::savePLYFileBinary(output_filename, *cloud);
+                std::cout << "Saved point cloud to " << output_filename << std::endl;
+
                 if (!options["preview"].empty()) {
                     cv::Mat show_frame;
                     frame.copyTo(show_frame);

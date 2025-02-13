@@ -61,7 +61,7 @@ void DepthAnything::init(std::string model_path, nvinfer1::ILogger& logger)
 }
 
 /**
- * @brief RTMSeg`s destructor
+ * @brief DepthAnything`s destructor
 */
 DepthAnything::~DepthAnything()
 {
@@ -121,27 +121,14 @@ cv::Mat DepthAnything::predict(cv::Mat& image)
 
     // Convert the entire depth_data vector to a CV_32FC1 Mat
     cv::Mat depth_mat(input_h, input_w, CV_32FC1, depth_data);
-    cv::normalize(depth_mat, depth_mat, 0, 255, cv::NORM_MINMAX, CV_8U);
+    double min_val, max_val;
+    cv::minMaxLoc(depth_mat, &min_val, &max_val);
+    std::cout << "Depth range: " << min_val << " to " << max_val << std::endl;
 
-    // Create a colormap from the depth data
-    cv::Mat colormap;
-    cv::applyColorMap(depth_mat, colormap, cv::COLORMAP_INFERNO);
+    // CV_8U will lead to precision loss while generating pointcloud.
+    //cv::normalize(depth_mat, depth_mat, 0, 255, cv::NORM_MINMAX, CV_8U);
 
-    // Rescale the colormap
-    int limX, limY;
-    if (img_w > img_h)
-    {
-        limX = input_w;
-        limY = input_w * img_h / img_w;
-    }
-    else
-    {
-        limX = input_w * img_w / img_h;
-        limY = input_w;
-    }
-    cv::resize(colormap, colormap, cv::Size(img_w, img_h));
-
-    return colormap;
+    return depth_mat;
 }
 
 
