@@ -20,6 +20,10 @@ Depth estimation is the task of measuring the distance of each pixel relative to
   Depth-Anything-V2
   <img src="assets/ferris_wheel_result.gif" height="225px" width="720px" />
 </p>
+<p align="center">
+  Metric Depth Estimation(PCL)
+  <img src="assets/Pcd_demo.jpg" height="225px" width="720px" />
+</p>
 
 
 
