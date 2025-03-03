@@ -273,10 +273,12 @@ int main(int argc, char** argv) {
                     if (frame.empty())
                         break;
                     auto start = std::chrono::system_clock::now();
-                    cv::Mat result_d = depth_model.predict(frame);
+                    std::pair<cv::Mat, cv::Mat> result = depth_model.predict(frame);
                     auto end = chrono::system_clock::now();
                     tpf = chrono::duration_cast<std::chrono::duration<double, std::milli>>(end - start).count();
 
+                    cv::Mat result_d = result.first;
+                    cv::Mat colormap = result.second;
                     if (previous_tpf == 0) {
                         estimate = (frame_total - frame_num) * (tpf / 1000.0);
                     } else if (frame_num <= 10) {
@@ -348,6 +350,8 @@ int main(int argc, char** argv) {
 
                 // open image
                 cv::Mat frame = cv::imread(imagePath);
+                int frame_w = frame.cols;
+                int frame_h = frame.rows;
                 // annotate this line if VRSM is enough
                 cv::resize(frame, frame, cv::Size(Cl_size, Cl_size), 0, 0, cv::INTER_LANCZOS4);
                 if (frame.empty())
@@ -356,13 +360,14 @@ int main(int argc, char** argv) {
                     continue;
                 }
                 
-                
                 auto start = chrono::system_clock::now();
-                cv::Mat result_d = depth_model.predict(frame);
+                std::pair<cv::Mat, cv::Mat> result = depth_model.predict(frame);
                 auto end = chrono::system_clock::now();
                 double tpf = chrono::duration_cast<std::chrono::duration<double, std::milli>>(end - start).count();
                 cout << "time per frame:" << setw(9) << tpf << "ms fps:" << setw(4) << floor(100 / (tpf / 1000)) / 100.0 << endl;
                 
+                cv::Mat result_d = result.first;
+                cv::Mat colormap = result.second;
                 if (result_d.type() != CV_32F) {
                     result_d.convertTo(result_d, CV_32F);
                 }
@@ -393,14 +398,6 @@ int main(int argc, char** argv) {
                     }
                 }
 
-                //std::cout << "Depth range: "
-                //    << resized_pred.at<float>(0, 0) << " to "
-                //    << resized_pred.at<float>(Cl_size - 1, Cl_size - 1) << std::endl;
-                //std::cout << "Sample point: ("
-                //    << cloud->points[0].x << ", "
-                //    << cloud->points[0].y << ", "
-                //    << cloud->points[0].z << ")" << std::endl;
-
                 // Save PCL ponitcloud file
                 std::filesystem::path file_path(imagePath);
                 std::string output_filename = (std::filesystem::path("result_pcl") / file_path.stem()).string() + ".ply";
@@ -411,13 +408,13 @@ int main(int argc, char** argv) {
                     cv::Mat show_frame;
                     frame.copyTo(show_frame);
                     cv::Mat result;
-                    cv::hconcat(show_frame, result_d, result);
-                    cv::resize(result, result, cv::Size(1080, 480));
+                    cv::hconcat(show_frame, colormap, result);
+                    cv::resize(result, result, cv::Size(frame_h, frame_w));
                     imshow("depth_result", result);
                     cv::waitKey(1);
                 }
                 
-                cv::imwrite(full_output_location, result_d);
+                cv::imwrite(full_output_location, colormap);
 
                 cout << full_output_location << " finished generating." << endl << endl;
             }
