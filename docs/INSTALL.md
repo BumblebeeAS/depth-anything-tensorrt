@@ -57,7 +57,7 @@
    ```
 
 ## Tested Environment
-   - TensorRT 8.6
-   - CUDA 11.6
-   - Windows 10
+   - TensorRT 8.6/10.3
+   - CUDA 11.6/12.4
+   - Windows 10/11
    - PCL 1.13.1
