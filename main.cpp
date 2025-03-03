@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include <tuple>
 #include <cmath>
@@ -11,10 +11,10 @@
 #define NOMINMAX        // avoid macro conflict(min/max) between PCL and Std
 #include <windows.h>
 #include <algorithm>  // make sure std::max/std::min can use normally
-#include <Eigen/Dense>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <pcl/filters/statistical_outlier_removal.h>
 #include <filesystem>
 #else
 #include <sys/stat.h>
@@ -24,7 +24,7 @@
 using namespace std;
 
 #define Cl_size 518                      
-#define Focal_length 3686.4     //finetune this para if you don't satisfy the result
+#define Focal_length 500     //finetune this para if you don't satisfy the result
 
 // Helper function to replace all occurrences of a character in a string
 void replaceChar(std::string& str, char find, char replace) {
@@ -376,31 +376,30 @@ int main(int argc, char** argv) {
                 cloud->height = Cl_size;
                 cloud->is_dense = true;
                 cloud->points.resize(cloud->width* cloud->height);
-                // Generate gria and calculate offsets
+                // Generate grid and calculate coordinates
                 for (int y = 0; y < Cl_size; ++y) {
                     for (int x = 0; x < Cl_size; ++x) {
-                        double depth = resized_pred.at<float>(y, x);
+                        double depth = resized_pred.at<float>(y, Cl_size - x);
                         if (depth > 10000 || depth < 0.01) continue;  // filter wrong depth numbers
                         pcl::PointXYZRGB point;
-                        point.x = (static_cast<float>(x) - Cl_size / 2.0f) * depth / Focal_length;
-                        point.y = (static_cast<float>(y) - Cl_size / 2.0f) * depth / Focal_length;
+                        point.x = (static_cast<float>(Cl_size - x) - Cl_size / 2.0f) * depth / Focal_length;
+                        point.y = (static_cast<float>(Cl_size - y) - Cl_size / 2.0f) * depth / Focal_length;
                         point.z = depth;
-                        cv::Vec3b color = frame.at<cv::Vec3b>(y, x);
+                        cv::Vec3b color = frame.at<cv::Vec3b>(y, Cl_size - x);
                         point.r = color[2];
                         point.g = color[1];
                         point.b = color[0];
-                        cloud->at(x, y) = point;
+                        cloud->at(Cl_size - x, y) = point;
                     }
                 }
 
-                std::cout << "Depth range: "
-                    << resized_pred.at<float>(0, 0) << " to "
-                    << resized_pred.at<float>(Cl_size - 1, Cl_size - 1) << std::endl;
-
-                std::cout << "Sample point: ("
-                    << cloud->points[0].x << ", "
-                    << cloud->points[0].y << ", "
-                    << cloud->points[0].z << ")" << std::endl;
+                //std::cout << "Depth range: "
+                //    << resized_pred.at<float>(0, 0) << " to "
+                //    << resized_pred.at<float>(Cl_size - 1, Cl_size - 1) << std::endl;
+                //std::cout << "Sample point: ("
+                //    << cloud->points[0].x << ", "
+                //    << cloud->points[0].y << ", "
+                //    << cloud->points[0].z << ")" << std::endl;
 
                 // Save PCL ponitcloud file
                 std::filesystem::path file_path(imagePath);
