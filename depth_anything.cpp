@@ -140,10 +140,6 @@ std::pair<cv::Mat, cv::Mat> DepthAnything::predict(cv::Mat& image)
     }
     cv::resize(colormap, colormap, cv::Size(img_w, img_h));
 
-
-    // CV_8U will lead to precision loss while generating pointcloud.
-    //cv::normalize(depth_mat, depth_mat, 0, 255, cv::NORM_MINMAX, CV_8U);
-
     std::pair<cv::Mat, cv::Mat> result;
 
     result.first = depth_mat;

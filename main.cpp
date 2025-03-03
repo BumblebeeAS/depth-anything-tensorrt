@@ -7,14 +7,14 @@
 #include <opencv2/opencv.hpp>
 #include "utils.h"
 #include "depth_anything.h"
-#ifdef _WIN32
-#define NOMINMAX        // avoid macro conflict(min/max) between PCL and Std
-#include <windows.h>
-#include <algorithm>  // make sure std::max/std::min can use normally
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/filters/statistical_outlier_removal.h>
+#ifdef _WIN32
+#define NOMINMAX        // Avoid macro conflict(min/max) between PCL and Std
+#include <windows.h>
+#include <algorithm>  // Make sure std::max/std::min can use normally
 #include <filesystem>
 #else
 #include <sys/stat.h>
@@ -24,7 +24,7 @@
 using namespace std;
 
 #define Cl_size 518                      
-#define Focal_length 500     //finetune this para if you don't satisfy the result
+#define Focal_length 500     //Finetune this para if you don't satisfy the result
 
 // Helper function to replace all occurrences of a character in a string
 void replaceChar(std::string& str, char find, char replace) {

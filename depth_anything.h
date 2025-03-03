@@ -14,7 +14,7 @@ class DepthAnything
 public:
 	DepthAnything();
     void init(std::string model_path, nvinfer1::ILogger& logger);
-	std::pair<cv::Mat, cv::Mat> predict(cv::Mat& image);
+	std::pair<cv::Mat, cv::Mat> predict(cv::Mat& image); // Depth & point cloud
 	~DepthAnything();
 	
 private:
