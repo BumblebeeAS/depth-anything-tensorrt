@@ -22,7 +22,7 @@ Depth estimation is the task of measuring the distance of each pixel relative to
 </p>
 <p align="center">
   Metric Depth Estimation(PCL)
-  <img src="assets/pcd_demo.png" height="225px" width="720px" />
+  <img src="assets/pcd_demo.jpg" height="225px" width="720px" />
 </p>
 
 
