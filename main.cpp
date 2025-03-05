@@ -23,7 +23,7 @@
 
 using namespace std;
 
-#define Cl_size 518                      
+#define Cl_size 512                      
 #define Focal_length 500     //Finetune this para if you don't satisfy the result
 
 // Helper function to replace all occurrences of a character in a string
@@ -387,8 +387,8 @@ int main(int argc, char** argv) {
                         double depth = resized_pred.at<float>(y, Cl_size - x);
                         if (depth > 10000 || depth < 0.01) continue;  // filter wrong depth numbers
                         pcl::PointXYZRGB point;
-                        point.x = (static_cast<float>(Cl_size - x) - Cl_size / 2.0f) * depth / Focal_length;
-                        point.y = (static_cast<float>(Cl_size - y) - Cl_size / 2.0f) * depth / Focal_length;
+                        point.x = (static_cast<float>(Cl_size - x) - Cl_size / 2.0f)  / Focal_length;
+                        point.y = (static_cast<float>(Cl_size - y) - Cl_size / 2.0f)  / Focal_length;
                         point.z = depth;
                         cv::Vec3b color = frame.at<cv::Vec3b>(y, Cl_size - x);
                         point.r = color[2];
