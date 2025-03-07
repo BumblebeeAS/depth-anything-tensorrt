@@ -13,6 +13,10 @@ Depth Anything TensorRT CLI
 Depth estimation is the task of measuring the distance of each pixel relative to the camera. This repo provides a TensorRT implementation of the [Depth-Anything](https://github.com/LiheYoung/Depth-Anything) depth estimation model in both C++ and Python, enabling efficient real-time inference.
 
 <p align="center">
+  Metric Depth Estimation(point cloud)
+  <img src="assets/pcd_demo.jpg" height="720px" width="720px" />
+</p>
+<p align="center">
   Depth-Anything-V1
   <img src="assets/davis_dolphins_result.gif" height="225px" width="720px" />
 </p>
@@ -20,15 +24,10 @@ Depth estimation is the task of measuring the distance of each pixel relative to
   Depth-Anything-V2
   <img src="assets/ferris_wheel_result.gif" height="225px" width="720px" />
 </p>
-<p align="center">
-  Metric Depth Estimation(PCL)
-  <img src="assets/pcd_demo.jpg" height="720px" width="720px" />
-</p>
-
 
 
 ## News
-* **2025-02-13:** Add Metric Depth Estimation(PCL).
+* **2025-02-13:** Add Metric Depth Estimation(point cloud).
 * **2024-08-20:** Added CLI (xa1on).
 * **2024-06-20:** Added support for TensorRT 10.
 * **2024-06-17:** [Depth Anything V2](https://github.com/DepthAnything/Depth-Anything-V2) has been integrated.
