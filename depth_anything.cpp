@@ -65,9 +65,13 @@ void DepthAnything::init(std::string model_path, nvinfer1::ILogger& logger)
 */
 DepthAnything::~DepthAnything()
 {
-    cudaFree(stream);
+    cudaStreamDestroy(stream);
     cudaFree(buffer[0]);
     cudaFree(buffer[1]);
+
+    delete context;
+    delete engine;
+    delete runtime;
 
     delete[] depth_data;
 }
